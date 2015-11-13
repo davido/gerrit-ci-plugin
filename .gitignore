@@ -1,0 +1,12 @@
+/target
+/.classpath
+/.project
+/.settings
+/.buckconfig.local
+/.buckd
+/buck-cache
+/buck-out
+/local.properties
+*.pyc
+.buckversion
+/bucklets
