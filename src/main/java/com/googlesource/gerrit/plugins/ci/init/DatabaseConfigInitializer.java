@@ -12,29 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.googlesource.gerrit.plugins.ci;
+package com.googlesource.gerrit.plugins.ci.init;
 
-import com.google.gerrit.pgm.init.api.InitStep;
-import com.google.inject.Inject;
+import com.google.gerrit.pgm.init.api.Section;
 
-import com.googlesource.gerrit.plugins.ci.server.CiDb;
+/** Abstraction of initializer for the database section */
+interface DatabaseConfigInitializer {
 
-public class InitPlugin implements InitStep {
-
-  // TODO(davido): Add site initialization logic
-  @SuppressWarnings("unused")
-  private final CiDb ciDb;
-
-  @Inject
-  InitPlugin(CiDb ciDb) {
-    this.ciDb = ciDb;
-  }
-
-  @Override
-  public void run() throws Exception {
-  }
-
-  @Override
-  public void postRun() throws Exception {
-  }
+  /**
+   * Performs database platform specific configuration steps and writes
+   * configuration parameters into the given database section
+   */
+  void initConfig(Section pluginSection);
 }

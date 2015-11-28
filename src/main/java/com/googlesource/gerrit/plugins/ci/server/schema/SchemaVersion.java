@@ -23,6 +23,8 @@ import com.google.gwtorm.server.OrmException;
 import com.google.gwtorm.server.StatementExecutor;
 import com.google.inject.Provider;
 
+import com.googlesource.gerrit.plugins.ci.server.CiDb;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -60,7 +62,7 @@ public abstract class SchemaVersion {
     return versionNbr;
   }
 
-  public final void check(UpdateUI ui, CurrentSchemaVersion curr, ReviewDb db)
+  public final void check(UpdateUI ui, CurrentSchemaVersion curr, CiDb db)
       throws OrmException, SQLException {
     if (curr.versionNbr == versionNbr) {
       // Nothing to do, we are at the correct schema.
@@ -73,7 +75,7 @@ public abstract class SchemaVersion {
   }
 
   /** Runs check on the prior schema version, and then upgrades. */
-  private void upgradeFrom(UpdateUI ui, CurrentSchemaVersion curr, ReviewDb db)
+  private void upgradeFrom(UpdateUI ui, CurrentSchemaVersion curr, CiDb db)
       throws OrmException, SQLException {
     List<SchemaVersion> pending = pending(curr.versionNbr);
     updateSchema(pending, ui, db);
@@ -110,7 +112,7 @@ public abstract class SchemaVersion {
   }
 
   private void updateSchema(List<SchemaVersion> pending, UpdateUI ui,
-      ReviewDb db) throws OrmException, SQLException {
+      CiDb db) throws OrmException, SQLException {
     for (SchemaVersion v : pending) {
       ui.message(String.format("Upgrading schema to %d ...", v.getVersionNbr()));
       v.preUpdateSchema(db);
@@ -129,11 +131,11 @@ public abstract class SchemaVersion {
    * @throws OrmException if a Gerrit-specific exception occurred.
    * @throws SQLException if an underlying SQL exception occurred.
    */
-  protected void preUpdateSchema(ReviewDb db) throws OrmException, SQLException {
+  protected void preUpdateSchema(CiDb db) throws OrmException, SQLException {
   }
 
   private void migrateData(List<SchemaVersion> pending, UpdateUI ui,
-      CurrentSchemaVersion curr, ReviewDb db) throws OrmException, SQLException {
+      CurrentSchemaVersion curr, CiDb db) throws OrmException, SQLException {
     for (SchemaVersion v : pending) {
       ui.message(String.format(
           "Migrating data to schema %d ...",
@@ -152,11 +154,11 @@ public abstract class SchemaVersion {
    * @throws OrmException if a Gerrit-specific exception occurred.
    * @throws SQLException if an underlying SQL exception occurred.
    */
-  protected void migrateData(ReviewDb db, UpdateUI ui) throws OrmException, SQLException {
+  protected void migrateData(CiDb db, UpdateUI ui) throws OrmException, SQLException {
   }
 
   /** Mark the current schema version. */
-  protected void finish(CurrentSchemaVersion curr, ReviewDb db)
+  protected void finish(CurrentSchemaVersion curr, CiDb db)
       throws OrmException {
     curr.versionNbr = versionNbr;
     db.schemaVersion().update(Collections.singleton(curr));

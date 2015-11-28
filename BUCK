@@ -8,6 +8,7 @@ gerrit_plugin(
     'Gerrit-PluginName: ci',
     'Gerrit-Module: com.googlesource.gerrit.plugins.ci.GlobalModule',
     'Gerrit-SshModule: com.googlesource.gerrit.plugins.ci.SshModule',
+    'Gerrit-InitStep: com.googlesource.gerrit.plugins.ci.init.InitPlugin',
     'Implementation-Title: CI plugin',
     'Implementation-URL: https://gerrit-review.googlesource.com/#/admin/projects/plugins/ci',
   ],

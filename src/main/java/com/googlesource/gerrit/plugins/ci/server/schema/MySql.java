@@ -17,31 +17,44 @@ package com.googlesource.gerrit.plugins.ci.server.schema;
 import static com.google.gerrit.server.schema.JdbcUtil.hostname;
 import static com.google.gerrit.server.schema.JdbcUtil.port;
 
-import com.google.gerrit.server.config.ConfigSection;
-import com.google.gerrit.server.config.GerritServerConfig;
+import com.google.gerrit.extensions.annotations.PluginName;
+import com.google.gerrit.server.config.PluginConfig;
+import com.google.gerrit.server.config.SitePaths;
 import com.google.inject.Inject;
+import com.google.inject.ProvisionException;
 
-import org.eclipse.jgit.lib.Config;
+import org.eclipse.jgit.errors.ConfigInvalidException;
+import org.eclipse.jgit.storage.file.FileBasedConfig;
+import org.eclipse.jgit.util.FS;
+
+import java.io.File;
+import java.io.IOException;
 
 class MySql extends CiBaseDataSourceType {
-
-  private Config cfg;
+  private final PluginConfig config;
 
   @Inject
-  public MySql(@GerritServerConfig final Config cfg) {
+  public MySql(SitePaths site,
+      @PluginName String pluginName) {
     super("com.mysql.jdbc.Driver");
-    this.cfg = cfg;
+    File file = site.gerrit_config.toFile();
+    FileBasedConfig cfg = new FileBasedConfig(file, FS.DETECTED);
+    try {
+      cfg.load();
+    } catch (IOException | ConfigInvalidException e) {
+      throw new ProvisionException(e.getMessage(), e);
+    }
+    this.config = new PluginConfig(pluginName, cfg);
   }
 
   @Override
   public String getUrl() {
     final StringBuilder b = new StringBuilder();
-    final ConfigSection dbs = new ConfigSection(cfg, "database");
     b.append("jdbc:mysql://");
-    b.append(hostname(dbs.optional("hostname")));
-    b.append(port(dbs.optional("port")));
+    b.append(hostname(config.getString("hostname")));
+    b.append(port(config.getString("port")));
     b.append("/");
-    b.append(dbs.required("database"));
+    b.append(config.getString("database"));
     return b.toString();
   }
 

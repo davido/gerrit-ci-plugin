@@ -20,6 +20,7 @@ import com.google.gerrit.extensions.config.FactoryModule;
 import com.google.gwtorm.jdbc.Database;
 import com.google.gwtorm.server.SchemaFactory;
 import com.google.inject.TypeLiteral;
+
 import com.googlesource.gerrit.plugins.ci.server.CiDb;
 
 /** Loads the database with standard dependencies. */

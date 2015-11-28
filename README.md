@@ -1,35 +1,54 @@
 Gerrit CI reporting and visualization plugin
 ============================================
 
-This plugin allow CI system to report result outcome to Gerrit. The result are visualized on change screen. Reporting can be done through SSH commands or REST API.
-
-Database schema doesn't created automatically for now. The scripts are povided separately:
-Prebuilt artifacts 
+This plugin allows CI system to report result outcome to Gerrit. The result is visualized on change screen pet patch set. Reporting can be done through SSH command or REST API.
 
 Persistense
 -----------
 
-CI data is stored in seperate database (not review DB used by Gerrit
+CI data is stored in seperate CI database (not review DB used by Gerrit
 itself). The following database dialects are currently supported:
 
+* Derby
 * H2
 * MySQL
 * Oracle
 * PostgreSQL
 
-Database schema doesn't created automatically for now. The script is povided for H2 only for now.
+Schema initialization
+---------------------
+
+Database is initialized and the schema is created with init plugin step:
 
 ```
-CREATE TABLE PATCH_SET_VERIFICATIONS(
-VALUE SMALLINT DEFAULT 0 NOT NULL,
-GRANTED TIMESTAMP NOT NULL,
-URL VARCHAR(255),
-VERIFIER VARCHAR(255),
-COMMENT VARCHAR(255),
-CHANGE_ID INTEGER DEFAULT 0 NOT NULL,
-PATCH_SET_ID INTEGER DEFAULT 0 NOT NULL,
-CATEGORY_ID VARCHAR(255) DEFAULT '' NOT NULL,
-PRIMARY KEY(CHANGE_ID, PATCH_SET_ID, CATEGORY_ID));
+*** SQL Database for CI plugin
+*** 
+
+Database server type           [h2]: ?
+       Supported options are:
+         derby
+         h2
+         mysql
+         oracle
+         postgresql
+Database server type           [h2]: h2
+
+Initialized <gerrit-site>
+```
+
+Schema upgrade
+--------------
+
+Schema upgrade takes place in init plugin step:
+
+```
+*** SQL Database for CI plugin
+*** 
+
+Database server type           [h2]: 
+
+Upgrading schema to 2 ...
+Migrating data to schema 2 ...
 ```
 
 Example for SSH command
@@ -66,8 +85,13 @@ TODO
 ----
 
 * Documentation
-* Schema initialization and upgrade
 * UI integration
+
+Pending changes in Gerrit core
+------------------------------
+
+https://gerrit-review.googlesource.com/72797
+
 
 License
 -------

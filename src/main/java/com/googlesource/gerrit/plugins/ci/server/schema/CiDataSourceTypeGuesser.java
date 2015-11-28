@@ -14,41 +14,42 @@
 
 package com.googlesource.gerrit.plugins.ci.server.schema;
 
-import java.nio.file.Path;
-
-import org.eclipse.jgit.lib.Config;
-
 import com.google.common.base.Strings;
 import com.google.gerrit.extensions.annotations.PluginName;
-import com.google.gerrit.server.config.PluginConfigFactory;
+import com.google.gerrit.server.config.PluginConfig;
 import com.google.gerrit.server.config.SitePaths;
 import com.google.inject.Inject;
 import com.google.inject.ProvisionException;
 
+import org.eclipse.jgit.errors.ConfigInvalidException;
+import org.eclipse.jgit.storage.file.FileBasedConfig;
+import org.eclipse.jgit.util.FS;
+
+import java.io.File;
+import java.io.IOException;
+
 public class CiDataSourceTypeGuesser {
 
-  private final Config cfg;
-  private final String configFile;
+  private final PluginConfig config;
 
   @Inject
   CiDataSourceTypeGuesser(SitePaths site,
-      PluginConfigFactory pluginConfig,
       @PluginName String pluginName) {
-    this.cfg = pluginConfig.getGlobalPluginConfig(pluginName);
-    configFile = String.format("%s.config", pluginName);
-    Path config = site.resolve("etc").resolve(configFile);
-    if (!config.toFile().exists()) {
-      throw new ProvisionException(
-          String.format("Config file %s for plugin %s doesn't exist",
-              configFile, pluginName));
+    File file = site.gerrit_config.toFile();
+    FileBasedConfig cfg = new FileBasedConfig(file, FS.DETECTED);
+    try {
+      cfg.load();
+    } catch (IOException | ConfigInvalidException e) {
+      throw new ProvisionException(e.getMessage(), e);
     }
+    this.config = new PluginConfig(pluginName, cfg);
   }
 
   public String guessDataSourceType() {
-    String dbType = cfg.getString("database", null, "type");
+    String dbType = config.getString("dbType");
     if (Strings.isNullOrEmpty(dbType)) {
       throw new ProvisionException(
-          String.format("'database.type' must be defined in: %s", configFile));
+          String.format("'dbType' must be defined in config file"));
     }
     return dbType.toLowerCase();
   }

@@ -14,7 +14,6 @@
 
 package com.googlesource.gerrit.plugins.ci.server.schema;
 
-import com.google.gerrit.server.schema.SchemaVersion;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.ProvisionException;

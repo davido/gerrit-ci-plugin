@@ -16,8 +16,8 @@ package com.googlesource.gerrit.plugins.ci;
 
 import static com.google.inject.Scopes.SINGLETON;
 
+import com.google.gerrit.extensions.config.FactoryModule;
 import com.google.gerrit.lifecycle.LifecycleModule;
-import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -35,9 +35,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-public class GlobalModule extends AbstractModule {
+public class GlobalModule extends FactoryModule {
 
-  private final  Injector injector;
+  private final Injector injector;
 
   @Inject
   GlobalModule(Injector injector) {

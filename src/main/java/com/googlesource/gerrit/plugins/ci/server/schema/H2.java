@@ -14,33 +14,44 @@
 
 package com.googlesource.gerrit.plugins.ci.server.schema;
 
-import org.eclipse.jgit.lib.Config;
-
 import com.google.gerrit.extensions.annotations.PluginName;
-import com.google.gerrit.server.config.PluginConfigFactory;
+import com.google.gerrit.server.config.PluginConfig;
 import com.google.gerrit.server.config.SitePaths;
 import com.google.inject.Inject;
+import com.google.inject.ProvisionException;
+
+import org.eclipse.jgit.errors.ConfigInvalidException;
+import org.eclipse.jgit.storage.file.FileBasedConfig;
+import org.eclipse.jgit.util.FS;
+
+import java.io.File;
+import java.io.IOException;
 
 class H2 extends CiBaseDataSourceType {
-
-  private final Config cfg;
   private final SitePaths site;
+  private final PluginConfig config;
 
   @Inject
   H2(SitePaths site,
-      PluginConfigFactory pluginConfig,
       @PluginName String pluginName) {
     super("org.h2.Driver");
-    this.cfg = pluginConfig.getGlobalPluginConfig(pluginName);
     this.site = site;
+    File file = site.gerrit_config.toFile();
+    FileBasedConfig cfg = new FileBasedConfig(file, FS.DETECTED);
+    try {
+      cfg.load();
+    } catch (IOException | ConfigInvalidException e) {
+      throw new ProvisionException(e.getMessage(), e);
+    }
+    this.config = new PluginConfig(pluginName, cfg);
   }
 
   @Override
   public String getUrl() {
-    String database = cfg.getString("database", null, "database");
-    if (database == null || database.isEmpty()) {
-      database = "db/CiDB";
+    String db = config.getString("database");
+    if (db == null || db.isEmpty()) {
+      db = "db/CiDB";
     }
-    return "jdbc:h2:" + site.resolve(database).toUri().toString();
+    return "jdbc:h2:" + site.resolve(db).toUri().toString();
   }
 }
