@@ -87,12 +87,6 @@ TODO
 * Documentation
 * UI integration
 
-Pending changes in Gerrit core
-------------------------------
-
-https://gerrit-review.googlesource.com/72797
-
-
 License
 -------
 
