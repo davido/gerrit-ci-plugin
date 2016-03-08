@@ -30,7 +30,7 @@ import com.google.gerrit.server.project.NoSuchChangeException;
 import com.google.gerrit.server.project.ProjectControl;
 import com.google.gerrit.sshd.CommandMetaData;
 import com.google.gerrit.sshd.SshCommand;
-import com.google.gerrit.sshd.commands.CommandUtils;
+import com.google.gerrit.sshd.commands.PatchSetParser;
 import com.google.gwtorm.server.OrmException;
 import com.google.inject.Inject;
 
@@ -60,7 +60,7 @@ public class VerifyCommand extends SshCommand {
       usage = "list of commits or patch sets to verify")
   void addPatchSetId(String token) {
     try {
-      PatchSet ps = CommandUtils.parsePatchSet(token, db, projectControl,
+      PatchSet ps = psParser.parsePatchSet(token, projectControl,
           branch);
       patchSets.add(ps);
     } catch (UnloggedFailure e) {
@@ -118,6 +118,9 @@ public class VerifyCommand extends SshCommand {
   @Inject
   private ChangeControl.GenericFactory genericFactory;
 
+  @Inject
+  private PatchSetParser psParser;
+
   private Map<String, VerificationInfo> jobResult = Maps.newHashMap();
 
   @Override
@@ -142,7 +145,7 @@ public class VerifyCommand extends SshCommand {
       throws RestApiException, NoSuchChangeException, OrmException,
       IOException {
     ChangeControl ctl =
-        genericFactory.controlFor(patchSet.getId().getParentKey(),
+        genericFactory.validateFor(db, patchSet.getId().getParentKey(),
             currentUser);
     ChangeResource changeResource = new ChangeResource(ctl);
     RevisionResource revResource = new RevisionResource(changeResource,
@@ -157,7 +160,7 @@ public class VerifyCommand extends SshCommand {
       applyVerification(patchSet, verify);
     } catch (RestApiException | NoSuchChangeException | OrmException
         | IOException e) {
-      throw CommandUtils.error(e.getMessage());
+      throw PatchSetParser.error(e.getMessage());
     }
   }
 
