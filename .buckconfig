@@ -1,6 +1,6 @@
 [alias]
-  ci = //:ci
-  plugin = //:ci
+  ci = //:gerrit-ci-plugin
+  plugin = //:gerrit-ci-plugin
 
 [java]
   src_roots = java, resources
@@ -11,4 +11,3 @@
 [cache]
   mode = dir
   dir = buck-out/cache
-
