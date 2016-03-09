@@ -1,7 +1,7 @@
 include_defs('//bucklets/gerrit_plugin.bucklet')
 
 gerrit_plugin(
-  name = 'ci',
+  name = 'gerrit-ci-plugin',
   srcs = glob(['src/main/java/**/*.java']),
   resources = glob(['src/main/**/*']),
   manifest_entries = [
@@ -21,16 +21,16 @@ gerrit_plugin(
 java_test(
   name = 'ci_tests',
   srcs = glob(['src/test/java/**/*IT.java']),
-  labels = ['ci-plugin'],
-  source_under_test = [':ci__plugin'],
+  labels = ['gerrit-ci-plugin'],
+  source_under_test = [':gerrit-ci-plugin__plugin'],
   deps = GERRIT_PLUGIN_API + GERRIT_TESTS + [
-    ':ci__plugin',
+    ':gerrit-ci-plugin__plugin',
   ],
 )
 
 java_library(
   name = 'classpath',
   deps = GERRIT_PLUGIN_API + GERRIT_TESTS + [
-    ':ci__plugin'
+    ':gerrit-ci-plugin__plugin'
   ],
 )
