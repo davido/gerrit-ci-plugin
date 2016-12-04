@@ -22,7 +22,6 @@ java_test(
   name = 'ci_tests',
   srcs = glob(['src/test/java/**/*IT.java']),
   labels = ['gerrit-ci-plugin'],
-  source_under_test = [':gerrit-ci-plugin__plugin'],
   deps = GERRIT_PLUGIN_API + GERRIT_TESTS + [
     ':gerrit-ci-plugin__plugin',
   ],
